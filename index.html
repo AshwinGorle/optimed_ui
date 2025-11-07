@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Leads Table</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Quality Leads</h1>
+    <div class="controls">
+      <label class="search">
+        🔎
+        <input id="searchInput" placeholder="Search by full name or company..." />
+      </label>
+      <div class="sort-legend">
+        <span>Sort:</span>
+        <button class="sort-btn" data-key="RELEVANCE_SCORE">Relevance</button>
+        <button class="sort-btn" data-key="COMPLETENESS_SCORE">Completeness</button>
+        <button class="sort-btn" data-key="COMPANY_NAME">Company</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="table-wrap" id="tableWrap">
+      <table id="leadsTable" class="leads-table" aria-label="Leads table">
+        <thead>
+          <tr id="tableHead">
+            <!-- Headings inserted by JS to enforce order and sorting state -->
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Rows inserted by JS -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <small>Showing data from <code>input.json</code>. No pagination — table supports 250+ records via scrolling.</small>
+  </footer>
+
+  <script src="script.js" type="module" ></script>
+
+</body>
+</html>

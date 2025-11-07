@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Lead detail</title>
+  <style>
+    :root{
+      --bg:#fbfdff;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#2563eb;
+      --border:#e6e9ef;
+      --radius:12px;
+      --mono:"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family:var(--mono);
+      background:linear-gradient(180deg,var(--bg),#fff);
+      color:#071127;
+      padding:20px;
+    }
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:18px;
+      border:1px solid var(--border);
+      box-shadow:0 8px 24px rgba(10,20,40,0.06);
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .breadcrumbs{ color:var(--muted); font-size:13px }
+    .title{ font-size:20px; font-weight:600 }
+    .actions{ display:flex; gap:8px; align-items:center; }
+    .btn{ padding:8px 12px; border-radius:8px; border:1px solid var(--border); cursor:pointer; background:transparent }
+    .btn.primary{ background:var(--accent); color:white; border:0 }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 340px;
+      gap:16px;
+    }
+    .card{
+      background:linear-gradient(180deg,#fff,#fbfdff);
+      border-radius:10px;
+      padding:14px;
+      border:1px solid var(--border);
+    }
+    .section{ margin-bottom:12px }
+    .k{ color:var(--muted); font-size:13px; margin-bottom:6px }
+    .v{ font-size:14px; font-weight:600 }
+    .list{ margin-left:0; padding-left:0; list-style:none }
+    .list li{ padding:6px 0; border-bottom:1px dashed #eef2f6; font-size:13px }
+    pre{
+      white-space:pre-wrap;
+      font-size:13px;
+      background:#f8fafc;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid var(--border);
+    }
+    .muted{ color:var(--muted); font-size:13px }
+    .chip{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#0b4dd1;
+      margin-right:6px;
+      margin-bottom:6px;
+      font-size:13px;
+    }
+    @media (max-width:980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="container">
+    <div class="top">
+      <div>
+        <div class="breadcrumbs"><a href="index.html">← Back to table</a></div>
+        <div class="title" id="leadTitle">Lead detail</div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="openRaw">View raw JSON</button>
+        <button class="btn primary" id="openLinkedin">Open LinkedIn</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="card section" id="summaryCard">
+          <div class="k">Contact</div>
+          <div class="v" id="nameField"></div>
+          <div class="muted" id="jobField"></div>
+          <div style="margin-top:10px">
+            <span class="k">Phones:</span>
+            <div id="phones"></div>
+          </div>
+          <div style="margin-top:8px">
+            <span class="k">Emails:</span>
+            <div id="emails"></div>
+          </div>
+        </div>
+
+        <div class="card section" id="companyCard">
+          <div class="k">Company</div>
+          <div class="v" id="companyName"></div>
+          <div class="muted" id="companyBasic"></div>
+          <div style="margin-top:10px">
+            <div class="k">Domain</div>
+            <div class="v" id="companyDomain"></div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="k">Industry / SIC</div>
+            <div id="industryRow"></div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="k">Description</div>
+            <pre id="companyDesc"></pre>
+          </div>
+        </div>
+
+        <div class="card section" id="scoresCard">
+          <div class="k">Quality scores</div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px">
+            <div>
+              <div class="muted">Completeness</div>
+              <div class="v" id="compScore"></div>
+            </div>
+            <div>
+              <div class="muted">Relevance</div>
+              <div class="v" id="relScore"></div>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <div class="muted">Relevance description</div>
+            <div id="relDesc"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <aside>
+        <div class="card section">
+          <div class="k">Quick facts</div>
+          <div class="list" id="quickFacts"></div>
+        </div>
+
+        <div class="card section">
+          <div class="k">History & Skills</div>
+          <div id="historyList"></div>
+        </div>
+
+      </aside>
+    </div>
+
+    <div style="margin-top:12px" id="rawJsonWrap" class="card" hidden>
+      <div class="k">Raw JSON</div>
+      <pre id="rawJson"></pre>
+    </div>
+  </div>
+
+  <script>
+    // parse querystring
+    function getQuery() {
+      const q = {};
+      location.search.replace(/^\?/,'').split('&').forEach(pair => {
+        if (!pair) return;
+        const [k,v] = pair.split('=');
+        q[decodeURIComponent(k)] = decodeURIComponent(v || '');
+      });
+      return q;
+    }
+
+    const q = getQuery();
+    let requestedUUID = q.uuid || null;
+    let requestedIndex = (typeof q.index !== 'undefined' && q.index !== '') ? q.index : null;
+
+    fetch('input.json')
+      .then(r => r.json())
+      .then(arr => {
+        const data = Array.isArray(arr) ? arr : [];
+        let record = null;
+        if (requestedUUID) {
+          record = data.find(x => x.UUID === requestedUUID);
+        }
+        if (!record && requestedIndex !== null) {
+          record = data.find(x => String(x.INDEX) === String(requestedIndex)) || data[Number(requestedIndex)];
+        }
+        if (!record && data.length === 1) record = data[0];
+        if (!record) {
+          document.getElementById('container').innerHTML = '<div style="padding:40px">Record not found. Check uuid/index in query string.</div>';
+          return;
+        }
+        populate(record);
+      }).catch(err => {
+        console.error(err);
+        document.getElementById('container').innerHTML = '<div style="padding:40px">Failed to load input.json — open console for error.</div>';
+      });
+
+    function safeJoin(a){ return Array.isArray(a) ? a.filter(Boolean).join(', ') : (a || '') }
+
+    function populate(r){
+      document.getElementById('leadTitle').textContent = (r.FIRST_NAME || '') + ' ' + (r.LAST_NAME || '');
+      document.getElementById('nameField').textContent = ((r.FIRST_NAME || '') + ' ' + (r.LAST_NAME || '')).trim();
+      document.getElementById('jobField').textContent = r.JOB_TITLE || r.HEADLINE || '';
+
+      document.getElementById('phones').innerHTML = safeJoin(r.VALID_PHONES).split(', ').map(p => `<div class="chip">${p}</div>`).join(' ');
+      const emails = safeJoin(r.BUSINESS_EMAIL || r.BUSINESS_EMAILS || r.DEEP_VERIFIED_EMAILS || r.PERSONAL_EMAILS);
+      document.getElementById('emails').innerHTML = emails.split(', ').map(e => `<div class="chip">${e}</div>`).join(' ');
+
+      document.getElementById('companyName').textContent = r.COMPANY_NAME || '';
+      document.getElementById('companyBasic').textContent = `${r.COMPANY_CITY || ''} ${r.COMPANY_STATE || ''} • ${r.COMPANY_EMPLOYEE_COUNT || ''} • ${r.COMPANY_REVENUE || ''}`;
+
+      document.getElementById('companyDomain').textContent = r.COMPANY_DOMAIN || '';
+
+      // industry + SIC
+      const industry = r.COMPANY_INDUSTRY || '';
+      const sic = Array.isArray(r.COMPANY_SIC) ? r.COMPANY_SIC.join(', ') : (r.COMPANY_SIC || '');
+      const sicDesc = Array.isArray(r.COMPANY_SIC_DETAIL) ? r.COMPANY_SIC_DETAIL.map(d => d.INDUSTRY_TITLE).filter(Boolean).join('; ') : '';
+      const industryRow = document.getElementById('industryRow');
+      industryRow.innerHTML = '';
+      if (industry) industryRow.innerHTML += `<div class="muted">${industry}</div>`;
+      if (sic) industryRow.innerHTML += `<div style="margin-top:6px"><span class="k">SIC:</span> <span class="v">${sic}</span></div>`;
+      if (sicDesc) industryRow.innerHTML += `<div style="margin-top:6px"><span class="k">SIC desc:</span><div class="muted">${sicDesc}</div></div>`;
+
+      document.getElementById('companyDesc').textContent = r.COMPANY_DESCRIPTION || r.COMPANY_SUMMARY || '';
+
+      document.getElementById('compScore').textContent = (r.COMPLETENESS_SCORE ?? '—');
+      document.getElementById('relScore').textContent = (r.RELEVANCE_SCORE ?? '—');
+      document.getElementById('relDesc').textContent = r.RELEVANCE_DESCRIPTION || '';
+
+      // quick facts list
+      const qf = document.getElementById('quickFacts');
+      qf.innerHTML = '';
+      const addQ = (k, v) => {
+        if (!v && v !== 0) return;
+        const li = document.createElement('div');
+        li.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`;
+        qf.appendChild(li);
+      };
+      addQ('UUID', r.UUID || '');
+      addQ('Index', r.INDEX ?? '');
+      addQ('Company phone', r.COMPANY_PHONE || '');
+      addQ('Skiptrace score', r.SKIPTRACE_MATCH_SCORE || '');
+      addQ('Net worth', r.NET_WORTH || '');
+      addQ('Age range', r.AGE_RANGE || '');
+
+      // history & skills
+      const hist = document.getElementById('historyList');
+      hist.innerHTML = '';
+      if (Array.isArray(r.COMPANY_NAME_HISTORY) && r.COMPANY_NAME_HISTORY.length){
+        const sec = document.createElement('div');
+        sec.innerHTML = '<div class="muted">Company history</div><ul class="list">' + r.COMPANY_NAME_HISTORY.map(x=>`<li>${x}</li>`).join('') + '</ul>';
+        hist.appendChild(sec);
+      }
+      if (Array.isArray(r.JOB_TITLE_HISTORY) && r.JOB_TITLE_HISTORY.length){
+        const sec = document.createElement('div');
+        sec.innerHTML = '<div class="muted">Job title history</div><ul class="list">' + r.JOB_TITLE_HISTORY.map(x=>`<li>${x}</li>`).join('') + '</ul>';
+        hist.appendChild(sec);
+      }
+      if (Array.isArray(r.SKILLS) && r.SKILLS.length){
+        const sec = document.createElement('div');
+        sec.innerHTML = '<div class="muted">Skills</div><div style="margin-top:8px">' + r.SKILLS.map(s=>`<span class="chip">${s}</span>`).join(' ') + '</div>';
+        hist.appendChild(sec);
+      }
+
+      // actions behavior
+      document.getElementById('openRaw').addEventListener('click', () => {
+        document.getElementById('rawJsonWrap').hidden = !document.getElementById('rawJsonWrap').hidden;
+        document.getElementById('rawJson').textContent = JSON.stringify(r, null, 2);
+      });
+
+      const linkedinUrl = r.LINKEDIN_URL || r.COMPANY_LINKEDIN_URL || '';
+      const openLinkedin = document.getElementById('openLinkedin');
+      if (linkedinUrl) {
+        openLinkedin.addEventListener('click', () => {
+          let url = linkedinUrl;
+          if (!url.startsWith('http')) url = 'https://' + url;
+          window.open(url, '_blank');
+        });
+      } else {
+        openLinkedin.disabled = true;
+        openLinkedin.title = 'No LinkedIn URL';
+      }
+    }
+  </script>
+</body>
+</html>

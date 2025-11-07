@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "axios": "^1.13.1",
+    "crypto": "^1.0.1",
+    "fetch": "^1.1.0",
+    "node-fetch": "^3.3.2",
+    "oauth-1.0a": "^2.2.6",
+    "soap": "^1.6.0"
+  }
+}
