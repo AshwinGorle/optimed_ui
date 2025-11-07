@@ -1,8 +1,4 @@
-// script.js
-// expects input.json in same folder (array of objects)
-// ordering of columns required:
-// INDEX, FULL_NAME (FIRST_NAME + LAST_NAME), COMPLETENESS_SCORE, RELEVANCE_SCORE, RELEVANCE_DESCRIPTION, COMPANY_NAME, COMPANY_INDUSTRY, COMPANY_DOMAIN , COMPANY_REVENUE, COMPANY_CITY, COMPANY_STATE, VALID_PHONES, COMPANY_SIC, LINKEDIN_URL, SIC_DESCRIPTION (from COMPANY_SIC_DETAIL)
-// plus rest after that (we'll add JOB_TITLE, COMPANY_DESCRIPTION, BUSINESS_EMAILS)
+
 
 const HEAD_ORDER = [
     { key: 'VIEW', label: '' },       // first column: View button
@@ -177,29 +173,55 @@ const HEAD_ORDER = [
     }
   }
   
-//   function createNetSuiteProscpect(record) {
-//     // IMPORTANT: user requested this exact function name and that it currently be empty
+// async function createNetSuiteProscpect(record) {
 //     console.log('clicked', record?.UUID ?? record?.INDEX ?? null);
-//     createProspect(record)
-    
-//     // keep empty for user to implement later
-//   }
-
-async function createNetSuiteProscpect(record) {
-    console.log('clicked', record?.UUID ?? record?.INDEX ?? null);
   
-    // 🔧 Change this to your deployed or local API base URL
+//     // 🔧 Change this to your deployed or local API base URL
+//     const api_url = "https://optimed-api.vercel.app/api/create-prospect";
+//     // const api_url = "http://localhost:3000/api/create-prospect";
+  
+//     try {
+//       const response = await fetch(api_url, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(record),
+//       });
+  
+//       const data = await response.json();
+  
+//       if (response.ok && data.status === "success") {
+//         alert("✅ Record created successfully in NetSuite!");
+//       } else {
+//         alert("⚠️ Failed to create record: " + (data.message || "Unknown error"));
+//         console.error("API Error:", data);
+//       }
+//     } catch (error) {
+//       console.error("❌ Network or server error:", error);
+//       alert("❌ Unable to reach the API. Please try again later.");
+//     }
+//   }
+  
+function showLoading() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+  }
+  
+  function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+  
+  async function createNetSuiteProscpect(record) {
+    console.log('clicked', record?.UUID ?? record?.INDEX ?? null);
+    
     const api_url = "https://optimed-api.vercel.app/api/create-prospect";
-    // const api_url = "http://localhost:3000/api/create-prospect/";
-    // Example for local testing:
-    // const api_url = "http://localhost:3000/api/create-prospect";
+  
+    showLoading(); // 🟢 show overlay
   
     try {
       const response = await fetch(api_url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(record),
       });
   
@@ -214,10 +236,14 @@ async function createNetSuiteProscpect(record) {
     } catch (error) {
       console.error("❌ Network or server error:", error);
       alert("❌ Unable to reach the API. Please try again later.");
+    } finally {
+      hideLoading(); // 🔴 always hide overlay
     }
   }
-  
-  
+    
+
+
+
   // sorting
   function toggleSort(key) {
     if (!key) return;
